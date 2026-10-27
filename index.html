@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tıklama App</title>
+  <style>
+    :root {
+      --accent: #F27A1A;
+      --accent-dark: #d46610;
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --danger: #dc2626;
+      --ok: #16a34a;
+      --radius: 20px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 16px;
+      background:
+        radial-gradient(ellipse at top, #ffe8d4 0%, transparent 55%),
+        var(--bg);
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #ff9a4a);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(242,122,26,0.35);
+    }
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-text p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+    .field { margin-bottom: 16px; }
+    input[type="text"], input[type="tel"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fafafa;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(242,122,26,0.15);
+      background: #fff;
+    }
+    input.invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .error-msg {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 6px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 18px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, opacity 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(242,122,26,0.35);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+    .btn-link {
+      background: linear-gradient(135deg, var(--accent), #ff9a4a);
+      color: #fff;
+      font-size: 17px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(242,122,26,0.4);
+      margin: 18px 0 14px;
+    }
+    .btn-secondary {
+      background: #111827;
+      color: #fff;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff4eb;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    .step-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+    .timer-wrap {
+      margin-top: 8px;
+      margin-bottom: 4px;
+      display: none;
+    }
+    .timer-wrap.visible { display: block; }
+    .timer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .timer-top strong {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-size: 15px;
+    }
+    .progress {
+      height: 10px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), #ffb06a);
+      border-radius: 999px;
+      transition: width 0.2s linear;
+    }
+    .progress-bar.warn {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    .progress-bar.danger {
+      background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+    .dots {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e5e7eb;
+    }
+    .dot.done { background: var(--ok); }
+    .dot.current { background: var(--accent); transform: scale(1.25); }
+    .dot.missed { background: #fca5a5; }
+    .thank-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: var(--ok);
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      margin: 8px auto 18px;
+    }
+    .thank-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .thank-desc {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,39,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 22px 22px;
+      width: 100%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      animation: popIn 0.22s ease;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: none; }
+    }
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fff4eb;
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      margin: 0 auto 14px;
+    }
+    .modal h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .modal p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: inline-block; }
+    .btn.loading .btn-label { opacity: 0.85; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-toast {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .status-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+    <div class="status-toast" id="toast"></div>
+
+    <!-- ENTRY -->
+    <div class="screen active" id="screen-entry">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div class="brand-text">
+          <h1>Tıklama App</h1>
+          <p id="entry-subtitle">Link görevleri yükleniyor…</p>
+        </div>
+      </div>
+      <p class="step-desc" style="margin-bottom:18px;">
+        Başlamak için adınızı ve telefon numaranızı girin. Her linke tıkladıktan sonra bir sonraki link için 30 saniye beklemeniz gerekir.
+      </p>
+      <div class="field">
+        <label for="name">İsim</label>
+        <input type="text" id="name" placeholder="Adınız Soyadınız" autocomplete="name" maxlength="60" />
+        <div class="error-msg" id="name-err">Lütfen isminizi girin.</div>
+      </div>
+      <div class="field">
+        <label for="phone">Telefon</label>
+        <input type="tel" id="phone" placeholder="05xx xxx xx xx" inputmode="numeric" autocomplete="tel" maxlength="14" />
+        <div class="hint">Örnek: 05xx xxx xx xx</div>
+        <div class="error-msg" id="phone-err">Geçerli bir Türkiye cep numarası girin (05xx…).</div>
+      </div>
+      <button class="btn btn-primary" id="btn-start" type="button" disabled>
+        <span class="spinner"></span>
+        <span class="btn-label">Yükleniyor…</span>
+      </button>
+    </div>
+
+    <!-- STEP -->
+    <div class="screen" id="screen-step">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div class="brand-text">
+          <h1>Tıklama App</h1>
+          <p>Linke tıklayın, geri dönün</p>
+        </div>
+      </div>
+      <div class="step-badge" id="step-badge">Adım 1 / 12</div>
+      <div class="step-title">Trendyol linki</div>
+      <p class="step-desc">Aşağıdaki butona dokunun. Sayfa veya uygulama açılacak. İşiniz bitince geri dönün.</p>
+
+      <button class="btn btn-link" id="btn-open-link" type="button">
+        Linki Aç →
+      </button>
+
+      <div class="timer-wrap" id="timer-wrap">
+        <div class="timer-top">
+          <span id="timer-label">Sonraki link için bekleyin</span>
+          <strong id="timer-text">30s</strong>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <!-- THANK YOU -->
+    <div class="screen" id="screen-thanks">
+      <div class="thank-icon">✓</div>
+      <div class="thank-title">Teşekkürler!</div>
+      <p class="thank-desc" id="thank-desc">Tüm adımlar kaydedildi. Bu pencereyi kapatabilirsiniz.</p>
+      <button class="btn btn-ghost" id="btn-restart" type="button">Yeni oturum başlat</button>
+    </div>
+  </div>
+
+  <!-- Modal: close Trendyol -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="modal-icon">⚠</div>
+      <h2>Trendyol uygulamasını kapatın</h2>
+      <p id="modal-desc">Linke tıkladınız. Trendyol sekmesini / uygulamasını kapatıp buraya dönün, ardından devam edin.</p>
+      <button class="btn btn-secondary" id="btn-closed" type="button">Kapattım</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== LINKS (fallback if sheet fetch fails) =====
+    var DEFAULT_LINKS = [
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/9r1yd1xlfk27r',
+      'https://ty.gl/jmxpd7ghsh2r3',
+      'https://ty.gl/p827wlkmwtbza',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/ef1l6mogmc86s',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/9r1yd1xlfk27r',
+      'https://ty.gl/jmxpd7ghsh2r3',
+      'https://ty.gl/p827wlkmwtbza',
+      'https://ty.gl/qn0a5t8k1gohu',
+      'https://ty.gl/ef1l6mogmc86s'
+    ];
+    // Active list for this page load / session (mutated after fetch)
+    var LINKS = DEFAULT_LINKS.slice();
+    // =============================
+
+    var WAIT_MS = 30000;
+    var STORAGE_KEY = 'tiklama_session_v2';
+
+    var state = {
+      sessionId: null,
+      name: '',
+      phone: '',
+      step: 0,            // 0-based current step index
+      clicked: false,     // whether current step was tapped (local)
+      confirmed: [],      // per-step: server confirmed click log
+      statuses: [],       // 'done' | 'pending' for each step
+      tapAt: null,        // Date.now() when current link was first tapped
+      timerId: null,      // interval used only to refresh UI from Date.now()
+      awaitingReturn: false,
+      modalOpen: false,
+      logPending: false,  // click log in flight / retrying
+      logFailed: false,   // retries exhausted for current step
+      sessionDone: false  // last link click+finish fired
+    };
+
+    // ---- helpers ----
+    function $(id) { return document.getElementById(id); }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function (el) {
+        el.classList.toggle('active', el.id === id);
+      });
+    }
+
+    function toast(msg) {
+      var t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 1800);
+    }
+
+    function saveLocal() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          sessionId: state.sessionId,
+          name: state.name,
+          phone: state.phone,
+          step: state.step,
+          statuses: state.statuses,
+          clicked: state.clicked,
+          confirmed: state.confirmed,
+          tapAt: state.tapAt,
+          awaitingReturn: state.awaitingReturn,
+          sessionDone: state.sessionDone,
+          links: LINKS.slice()
+        }));
+      } catch (e) {}
+    }
+
+    function loadLocal() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) { return null; }
+    }
+
+    function clearLocal() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      try { localStorage.removeItem('tiklama_session_v1'); } catch (e) {}
+    }
+
+    function formatPhoneInput(raw) {
+      var digits = String(raw || '').replace(/\D/g, '');
+      if (digits.length && digits[0] !== '0') {
+        if (digits.length === 10 && digits[0] === '5') digits = '0' + digits;
+      }
+      digits = digits.slice(0, 11);
+      var out = digits;
+      if (digits.length > 4) out = digits.slice(0, 4) + ' ' + digits.slice(4);
+      if (digits.length > 7) out = digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7);
+      if (digits.length > 9) out = digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 9) + ' ' + digits.slice(9);
+      return out;
+    }
+
+    function isValidTRMobile(formatted) {
+      var digits = String(formatted || '').replace(/\D/g, '');
+      return /^05\d{9}$/.test(digits);
+    }
+
+    /** Digits with leading 0, formatted as "05xx xxx xx xx" for the sheet. */
+    function phoneForSheet(formatted) {
+      var digits = String(formatted || '').replace(/\D/g, '');
+      if (digits.length === 10 && digits[0] === '5') digits = '0' + digits;
+      if (digits.length === 11) {
+        return digits.slice(0, 4) + ' ' + digits.slice(4, 7) + ' ' + digits.slice(7, 9) + ' ' + digits.slice(9);
+      }
+      return digits;
+    }
+
+    function remainingMs() {
+      if (!state.tapAt) return 0;
+      return Math.max(0, WAIT_MS - (Date.now() - state.tapAt));
+    }
+
+    function remainingSec() {
+      return Math.ceil(remainingMs() / 1000);
+    }
+
+    function waitDone() {
+      return !state.tapAt || remainingMs() <= 0;
+    }
+
+    // Apps Script web app (JSON API via doPost). text/plain avoids CORS preflight.
+    var API_URL = 'https://script.google.com/macros/s/AKfycbxI63Jc9ixORnF_QW3nzdODLF78fCkaSdBSqdOMFCS2phomxin0yRJo-EzsAN4pgdiPBQ/exec';
+
+    function apiCall(payload, attempt) {
+      attempt = attempt || 0;
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      }).then(function (res) {
+        return res.text().then(function (text) {
+          var data;
+          try { data = JSON.parse(text); } catch (e) {
+            throw new Error('Geçersiz API yanıtı');
+          }
+          if (!data || data.ok !== true) {
+            throw new Error((data && data.error) || 'API hatası');
+          }
+          return data.result;
+        });
+      }).catch(function (err) {
+        if (attempt < 1) {
+          toast('Kayıt hatası, tekrar deneniyor…');
+          return apiCall(payload, attempt + 1);
+        }
+        throw err;
+      });
+    }
+
+    function runServer(fnName, args, onSuccess, onFailure) {
+      var payload;
+      if (fnName === 'startSession') {
+        payload = { action: 'start', name: args[0], phone: args[1] };
+      } else if (fnName === 'logClick') {
+        payload = { action: 'click', sessionId: args[0], linkIndex: args[1], clicked: args[2] };
+      } else if (fnName === 'finish') {
+        payload = { action: 'finish', sessionId: args[0] };
+      } else if (fnName === 'getLinks') {
+        payload = { action: 'links' };
+      } else if (fnName === 'clickAndFinish') {
+        payload = { action: 'clickfinish', sessionId: args[0], linkIndex: args[1], clicked: args[2] !== false };
+      } else if (fnName === 'checkClick') {
+        payload = { action: 'check', sessionId: args[0], linkIndex: args[1] };
+      } else {
+        console.error('Unknown fn', fnName);
+        if (onFailure) onFailure(new Error('Unknown fn'));
+        return;
+      }
+      apiCall(payload).then(function (result) {
+        if (onSuccess) onSuccess(result);
+      }).catch(function (err) {
+        console.error(fnName, err);
+        if (onFailure) onFailure(err);
+        else toast('Kayıt hatası, tekrar deneniyor…');
+      });
+    }
+
+    /** Survives tab backgrounding when opening Trendyol (last step). */
+    function beaconPost(payload) {
+      var body = JSON.stringify(payload);
+      try {
+        if (navigator.sendBeacon) {
+          var blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
+          if (navigator.sendBeacon(API_URL, blob)) return true;
+        }
+      } catch (e) {}
+      try {
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: body,
+          keepalive: true,
+          redirect: 'follow'
+        }).catch(function () {});
+        return true;
+      } catch (e2) {
+        return false;
+      }
+    }
+
+    function applyLinks(list) {
+      var cleaned = (list || []).map(function (u) {
+        return String(u || '').trim();
+      }).filter(Boolean);
+      if (cleaned.length) {
+        LINKS = cleaned;
+      } else {
+        LINKS = DEFAULT_LINKS.slice();
+      }
+      var sub = $('entry-subtitle');
+      if (sub) sub.textContent = LINKS.length + ' adımlık link görevleri';
+      var thank = $('thank-desc');
+      if (thank) thank.textContent = LINKS.length + ' adımın tamamı kaydedildi. Bu pencereyi kapatabilirsiniz.';
+    }
+
+    function setStartReady(ready) {
+      var btn = $('btn-start');
+      var label = btn.querySelector('.btn-label');
+      if (ready) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        if (label) label.textContent = 'Başla';
+      } else {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        if (label) label.textContent = 'Yükleniyor…';
+      }
+    }
+
+    /** Fresh load: read Linkler sheet. Failures fall back to DEFAULT_LINKS. */
+    function loadLinksFromSheet(done) {
+      setStartReady(false);
+      runServer('getLinks', [], function (result) {
+        applyLinks(Array.isArray(result) ? result : []);
+        setStartReady(true);
+        if (done) done();
+      }, function () {
+        applyLinks(DEFAULT_LINKS);
+        setStartReady(true);
+        if (done) done();
+      });
+    }
+
+    // ---- entry ----
+    function setupEntry() {
+      var phoneEl = $('phone');
+      phoneEl.addEventListener('input', function () {
+        phoneEl.value = formatPhoneInput(phoneEl.value);
+        phoneEl.setSelectionRange(phoneEl.value.length, phoneEl.value.length);
+        phoneEl.classList.remove('invalid');
+        $('phone-err').classList.remove('show');
+      });
+
+      $('name').addEventListener('input', function () {
+        $('name').classList.remove('invalid');
+        $('name-err').classList.remove('show');
+      });
+
+      $('btn-start').addEventListener('click', startFlow);
+    }
+
+    function startFlow() {
+      var name = $('name').value.trim();
+      var phone = $('phone').value.trim();
+      var ok = true;
+      if (!name) {
+        $('name').classList.add('invalid');
+        $('name-err').classList.add('show');
+        ok = false;
+      }
+      if (!isValidTRMobile(phone)) {
+        $('phone').classList.add('invalid');
+        $('phone-err').classList.add('show');
+        ok = false;
+      }
+      if (!ok) return;
+
+      var btn = $('btn-start');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      var phoneText = phoneForSheet(phone);
+      runServer('startSession', [name, phoneText], function (sessionId) {
+        state.sessionId = sessionId;
+        state.name = name;
+        state.phone = phoneText;
+        state.step = 0;
+        state.statuses = LINKS.map(function () { return 'pending'; });
+        state.confirmed = LINKS.map(function () { return false; });
+        state.clicked = false;
+        state.tapAt = null;
+        state.awaitingReturn = false;
+        state.logPending = false;
+        state.logFailed = false;
+        state.sessionDone = false;
+        saveLocal();
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        beginStep(0);
+      }, function (err) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        toast('Bağlantı hatası. Tekrar deneyin.');
+        console.error(err);
+      });
+    }
+
+    // ---- steps ----
+    function renderDots() {
+      var html = '';
+      for (var i = 0; i < LINKS.length; i++) {
+        var cls = 'dot';
+        if (state.statuses[i] === 'done') cls += ' done';
+        else if (i === state.step) cls += ' current';
+        html += '<div class="' + cls + '"></div>';
+      }
+      $('dots').innerHTML = html;
+    }
+
+    function beginStep(index) {
+      if (index >= LINKS.length) {
+        completeAll();
+        return;
+      }
+      stopWaitTicker();
+      state.step = index;
+      state.clicked = false;
+      state.tapAt = null;
+      state.awaitingReturn = false;
+      state.logPending = false;
+      state.logFailed = false;
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      $('timer-wrap').classList.remove('visible');
+      $('step-badge').textContent = 'Adım ' + (index + 1) + ' / ' + LINKS.length;
+      $('btn-open-link').disabled = false;
+      $('btn-open-link').textContent = 'Linki Aç →';
+      resetClosedButton();
+      renderDots();
+      showScreen('screen-step');
+      saveLocal();
+    }
+
+    function resetClosedButton() {
+      var btn = $('btn-closed');
+      btn.disabled = false;
+      btn.textContent = 'Kapattım';
+    }
+
+    function startWaitTicker() {
+      stopWaitTicker();
+      updateWaitUI();
+      state.timerId = setInterval(function () {
+        updateWaitUI();
+      }, 250);
+    }
+
+    function stopWaitTicker() {
+      if (state.timerId) {
+        clearInterval(state.timerId);
+        state.timerId = null;
+      }
+    }
+
+    function updateWaitUI() {
+      var rem = remainingSec();
+      var done = waitDone();
+      var wrap = $('timer-wrap');
+      var bar = $('progress-bar');
+      var btn = $('btn-closed');
+
+      if (state.clicked && state.tapAt) {
+        wrap.classList.add('visible');
+        if (done) {
+          $('timer-text').textContent = 'Hazır';
+          $('timer-label').textContent = 'Sonraki linke geçebilirsiniz';
+          bar.style.width = '100%';
+          bar.classList.remove('warn', 'danger');
+        } else {
+          $('timer-text').textContent = rem + 's';
+          $('timer-label').textContent = 'Sonraki link için bekleyin';
+          var pct = Math.max(0, Math.min(100, ((WAIT_MS - remainingMs()) / WAIT_MS) * 100));
+          bar.style.width = pct + '%';
+          bar.classList.remove('warn', 'danger');
+          if (rem <= 5) bar.classList.add('danger');
+          else if (rem <= 10) bar.classList.add('warn');
+        }
+      } else {
+        wrap.classList.remove('visible');
+      }
+
+      if (state.modalOpen) {
+        var confirmed = !!state.confirmed[state.step];
+        if (!done) {
+          btn.disabled = true;
+          btn.textContent = 'Kapattım (' + rem + ' sn)';
+        } else if (state.logPending && !confirmed) {
+          btn.disabled = true;
+          btn.textContent = 'Tıklama kaydediliyor…';
+        } else if (state.logFailed && !confirmed) {
+          btn.disabled = true;
+          btn.textContent = 'Tıklama kaydedilemedi, linke tekrar dokunun';
+        } else if (!confirmed) {
+          btn.disabled = true;
+          btn.textContent = 'Tıklama kaydediliyor…';
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Kapattım';
+        }
+      }
+
+      if (done && state.clicked) {
+        // Keep ticking until user confirms; no auto-advance.
+        // Interval still useful while modal is open to enable the button.
+      }
+    }
+
+    function markConfirmed(stepIdx) {
+      state.confirmed[stepIdx] = true;
+      state.logPending = false;
+      state.logFailed = false;
+      saveLocal();
+      updateWaitUI();
+    }
+
+    /** Retry logClick up to 3 times with backoff; sets confirmed on success. */
+    function logClickWithRetry(stepIdx, attempt) {
+      attempt = attempt || 0;
+      state.logPending = true;
+      state.logFailed = false;
+      updateWaitUI();
+      runServer('logClick', [state.sessionId, stepIdx + 1, true], function () {
+        markConfirmed(stepIdx);
+      }, function () {
+        if (attempt < 2) {
+          var delay = 600 * Math.pow(2, attempt);
+          setTimeout(function () {
+            logClickWithRetry(stepIdx, attempt + 1);
+          }, delay);
+        } else {
+          state.logPending = false;
+          state.logFailed = true;
+          saveLocal();
+          updateWaitUI();
+          toast('Tıklama kaydedilemedi, linke tekrar dokunun');
+        }
+      });
+    }
+
+    function showThanksScreen() {
+      stopWaitTicker();
+      state.sessionDone = true;
+      state.awaitingReturn = false;
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      clearLocal();
+      showScreen('screen-thanks');
+    }
+
+    function onLinkTap() {
+      var url = LINKS[state.step];
+      var isLast = state.step >= LINKS.length - 1;
+      var firstTap = !state.clicked;
+      var needRelog = state.clicked && !state.confirmed[state.step] && (state.logFailed || !state.logPending);
+
+      if (firstTap) {
+        state.clicked = true;
+        state.statuses[state.step] = 'done';
+
+        if (isLast) {
+          // Last step: click+finish immediately; no wait / Kapattım
+          state.tapAt = null;
+          state.awaitingReturn = false;
+          state.sessionDone = true;
+          state.logPending = true;
+          var payload = {
+            action: 'clickfinish',
+            sessionId: state.sessionId,
+            linkIndex: state.step + 1,
+            clicked: true
+          };
+          beaconPost(payload);
+          // Also normal fetch when possible
+          runServer('clickAndFinish', [state.sessionId, state.step + 1, true], function () {
+            markConfirmed(state.step);
+            showThanksScreen();
+          }, function () {
+            // Beacon may still succeed; show thanks anyway
+            showThanksScreen();
+          });
+          saveLocal();
+        } else {
+          state.tapAt = Date.now();
+          state.awaitingReturn = true;
+          logClickWithRetry(state.step, 0);
+          saveLocal();
+          startWaitTicker();
+        }
+      } else if (needRelog && !isLast) {
+        // Re-send log without resetting the 30s timer
+        logClickWithRetry(state.step, 0);
+      }
+      // Re-tap otherwise: reopen link, keep timer
+
+      try {
+        window.open(url, '_blank');
+      } catch (e) {
+        window.location.href = url;
+      }
+
+      if (isLast) {
+        setTimeout(function () {
+          if (!document.hidden) showThanksScreen();
+        }, 700);
+      } else {
+        setTimeout(function () {
+          if (state.awaitingReturn && !state.modalOpen) {
+            if (!document.hidden) showCloseModal();
+          }
+        }, 600);
+      }
+    }
+
+    function showCloseModal() {
+      if (state.sessionDone) {
+        showThanksScreen();
+        return;
+      }
+      if (state.modalOpen) return;
+      state.modalOpen = true;
+      $('modal').classList.add('show');
+      updateWaitUI();
+    }
+
+    function onClosedConfirm() {
+      if (!waitDone() || !state.confirmed[state.step]) {
+        updateWaitUI();
+        return;
+      }
+      // Final sheet confirmation before advancing
+      var stepIdx = state.step;
+      var btn = $('btn-closed');
+      btn.disabled = true;
+      btn.textContent = 'Kontrol ediliyor…';
+      runServer('checkClick', [state.sessionId, stepIdx + 1], function (res) {
+        if (res && res.clicked) {
+          markConfirmed(stepIdx);
+          $('modal').classList.remove('show');
+          state.modalOpen = false;
+          state.awaitingReturn = false;
+          stopWaitTicker();
+          beginStep(stepIdx + 1);
+        } else {
+          state.confirmed[stepIdx] = false;
+          state.logFailed = true;
+          state.logPending = false;
+          saveLocal();
+          updateWaitUI();
+          toast('Tıklama kaydı bulunamadı, linke tekrar dokunun');
+        }
+      }, function () {
+        // If check fails but we already have local confirmed from logClick ok, still allow
+        if (state.confirmed[stepIdx]) {
+          $('modal').classList.remove('show');
+          state.modalOpen = false;
+          state.awaitingReturn = false;
+          stopWaitTicker();
+          beginStep(stepIdx + 1);
+        } else {
+          state.logFailed = true;
+          updateWaitUI();
+          toast('Kontrol başarısız, linke tekrar dokunun');
+        }
+      });
+    }
+
+    function onVisibilityOrFocus() {
+      if (state.sessionDone) {
+        if (!document.hidden) showThanksScreen();
+        return;
+      }
+      if (state.awaitingReturn && state.clicked && !state.modalOpen) {
+        if (!document.hidden) showCloseModal();
+      }
+      if (state.clicked && state.tapAt) {
+        updateWaitUI();
+      }
+    }
+
+    function completeAll() {
+      stopWaitTicker();
+      if (state.sessionId && !state.sessionDone) {
+        runServer('finish', [state.sessionId]);
+      }
+      showThanksScreen();
+    }
+
+    function resumeIfPossible() {
+      var saved = loadLocal();
+      if (!saved || !saved.sessionId) return false;
+      // Keep the same link list the session started with
+      if (saved.links && saved.links.length) {
+        applyLinks(saved.links);
+      }
+      state.sessionId = saved.sessionId;
+      state.name = saved.name || '';
+      state.phone = saved.phone || '';
+      state.step = Math.min(saved.step || 0, LINKS.length);
+      state.statuses = saved.statuses || LINKS.map(function () { return 'pending'; });
+      state.clicked = !!saved.clicked;
+      state.confirmed = saved.confirmed || LINKS.map(function () { return false; });
+      while (state.confirmed.length < LINKS.length) state.confirmed.push(false);
+      state.tapAt = saved.tapAt || null;
+      state.awaitingReturn = !!saved.awaitingReturn;
+      state.sessionDone = !!saved.sessionDone;
+      state.logPending = false;
+      state.logFailed = state.clicked && !state.confirmed[state.step];
+
+      if (state.sessionDone || state.step >= LINKS.length) {
+        showThanksScreen();
+        return true;
+      }
+
+      // Restore step UI without wiping tapAt
+      state.modalOpen = false;
+      $('modal').classList.remove('show');
+      $('step-badge').textContent = 'Adım ' + (state.step + 1) + ' / ' + LINKS.length;
+      $('btn-open-link').disabled = false;
+      $('btn-open-link').textContent = 'Linki Aç →';
+      resetClosedButton();
+      renderDots();
+      showScreen('screen-step');
+
+      if (state.clicked && state.tapAt) {
+        startWaitTicker();
+        // If they already tapped and are returning / reloading mid-wait, show modal
+        if (state.awaitingReturn || !waitDone()) {
+          showCloseModal();
+        } else if (state.awaitingReturn) {
+          showCloseModal();
+        }
+      }
+      return true;
+    }
+
+    // ---- wire up ----
+    function init() {
+      setupEntry();
+      $('btn-open-link').addEventListener('click', onLinkTap);
+      $('btn-closed').addEventListener('click', onClosedConfirm);
+      $('btn-restart').addEventListener('click', function () {
+        clearLocal();
+        stopWaitTicker();
+        state = {
+          sessionId: null, name: '', phone: '', step: 0, clicked: false,
+          confirmed: [], statuses: [], tapAt: null, timerId: null,
+          awaitingReturn: false, modalOpen: false,
+          logPending: false, logFailed: false, sessionDone: false
+        };
+        $('name').value = '';
+        $('phone').value = '';
+        $('modal').classList.remove('show');
+        showScreen('screen-entry');
+        // Fresh session: re-read sheet so edits apply immediately
+        loadLinksFromSheet();
+      });
+      document.addEventListener('visibilitychange', onVisibilityOrFocus);
+      window.addEventListener('focus', onVisibilityOrFocus);
+      if (resumeIfPossible()) {
+        // Mid-session resume: keep stored links, enable start for later restart
+        setStartReady(true);
+      } else {
+        // Every fresh load reads the sheet
+        loadLinksFromSheet();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
